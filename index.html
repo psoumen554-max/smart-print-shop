@@ -47,17 +47,16 @@
             </div>
 
             <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-                Generate Payment QR & Print
+                Send to Printer & Pay
             </button>
         </form>
 
-        <!-- QR Display Section -->
-        <div id="qrContainer" class="hidden text-center space-y-3 pt-4 border-t border-slate-100">
-            <p class="text-sm font-medium text-slate-700">Scan with any UPI App to Pay</p>
-            <div id="qrcode" class="flex justify-center">
-                <img id="qrImage" src="" alt="Payment QR" class="w-48 h-48 border rounded-xl shadow-sm"/>
-            </div>
-            <p class="text-xs text-emerald-600 font-semibold">File sent to shop! Complete payment to collect print.</p>
+        <!-- Secure Payment Button (Appears after file is sent) -->
+        <div id="payContainer" class="hidden space-y-3 pt-2 text-center">
+            <a id="upiButton" href="#" class="block w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                Pay ₹0 via UPI App
+            </a>
+            <p class="text-xs text-emerald-600 font-medium">✓ File sent to shop printer successfully!</p>
         </div>
     </div>
 
@@ -122,7 +121,7 @@
             }
 
             const btn = document.getElementById('submitBtn');
-            btn.textContent = "Processing order...";
+            btn.textContent = "Sending file to shop...";
             btn.disabled = true;
 
             const formData = new FormData();
@@ -139,17 +138,19 @@
                 console.error(err);
             }
 
-            // Generate UPI QR Code on Screen
+            // Generate UPI Intent URL with Transaction ID (tr) & Note (tn)
             const shopUpiID = "7029059551@okbizaxis"; 
             const shopName = "Solution Point";
-            const upiUrl = `upi://pay?pa=${shopUpiID}&pn=${encodeURIComponent(shopName)}&am=${calculatedTotal}&cu=INR`;
+            const txnId = "SP" + Date.now();
+            const upiUrl = `upi://pay?pa=${shopUpiID}&pn=${encodeURIComponent(shopName)}&am=${calculatedTotal}&cu=INR&tr=${txnId}&tn=PrintOrder`;
             
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+            // Populate and show the secure payment button
+            const upiButton = document.getElementById('upiButton');
+            upiButton.href = upiUrl;
+            upiButton.textContent = `Pay ₹${calculatedTotal} via UPI App`;
             
-            document.getElementById('qrImage').src = qrApiUrl;
-            document.getElementById('qrContainer').classList.remove('hidden');
-            
-            btn.textContent = "Order Placed Successfully!";
+            document.getElementById('printForm').classList.add('hidden');
+            document.getElementById('payContainer').classList.remove('hidden');
         });
     </script>
 </body>
