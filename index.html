@@ -82,12 +82,18 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            if (file.type === 'application/pdf') {
+            if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
                 const reader = new FileReader();
                 reader.onload = async function() {
-                    const typedarray = new Uint8Array(this.result);
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    detectedPages = pdf.numPages;
+                    try {
+                        const typedarray = new Uint8Array(this.result);
+                        const loadingTask = pdfjsLib.getDocument({ data: typedarray });
+                        const pdf = await loadingTask.promise;
+                        detectedPages = pdf.numPages;
+                    } catch (err) {
+                        console.error("PDF reading error:", err);
+                        detectedPages = 1; // Fallback to 1 page if error occurs
+                    }
                     updateCost();
                 };
                 reader.readAsArrayBuffer(file);
