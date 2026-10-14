@@ -52,7 +52,7 @@
 
             <!-- Submit Button -->
             <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-                Proceed to Pay & Print
+                Pay via UPI & Print
             </button>
         </form>
     </div>
@@ -61,6 +61,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         let detectedPages = 1;
+        let calculatedTotal = 0;
 
         const fileInput = document.getElementById('fileInput');
         const printTypeSelect = document.getElementById('printType');
@@ -72,10 +73,10 @@
             const printType = printTypeSelect.value;
             const copies = parseInt(copiesInput.value) || 1;
             const rate = printType === 'bw' ? 2 : 10;
-            const total = detectedPages * rate * copies;
+            calculatedTotal = detectedPages * rate * copies;
             
             pageCountDisplay.textContent = detectedPages;
-            totalAmountDisplay.textContent = `₹${total}`;
+            totalAmountDisplay.textContent = `₹${calculatedTotal}`;
         }
 
         fileInput.addEventListener('change', async (e) => {
@@ -92,7 +93,6 @@
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                // Images count as 1 page by default
                 detectedPages = 1;
                 updateCost();
             }
@@ -103,7 +103,20 @@
 
         document.getElementById('printForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            alert('Order placed successfully! (Payment integration and auto-print bridge coming up next).');
+            if (calculatedTotal <= 0) {
+                alert('Please upload a valid document first.');
+                return;
+            }
+
+            // Replace with your actual shop UPI ID (e.g., yourname@paytm or number@ybl)
+            const shopUpiID = "7029059551@okbizaxis"; 
+            const shopName = "Solution Point";
+            
+            // Generate UPI Intent Link
+            const upiUrl = `upi://pay?pa=${shopUpiID}&pn=${encodeURIComponent(shopName)}&am=${calculatedTotal}&cu=INR`;
+            
+            // Open customer's UPI app
+            window.location.href = upiUrl;
         });
     </script>
 </body>
