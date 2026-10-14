@@ -64,9 +64,9 @@
         const pageCountDisplay = document.getElementById('pageCountDisplay');
         const totalAmountDisplay = document.getElementById('totalAmountDisplay');
 
-        // PUT YOUR TELEGRAM BOT TOKEN AND CHAT ID HERE
-        const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE";
-        const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE";
+        // Configured Credentials
+        const TELEGRAM_BOT_TOKEN = "8776483973:AAEGJyO3MQeZgDoOxngfw6EqPmDO9dvaIVc";
+        const TELEGRAM_CHAT_ID = "643383513";
 
         async function updateCost() {
             const printType = printTypeSelect.value;
@@ -113,12 +113,12 @@
             btn.disabled = true;
 
             const formData = new FormData();
-            formData.append('chat_id', 643383513);
+            formData.append('chat_id', TELEGRAM_CHAT_ID);
             formData.append('document', file);
             formData.append('caption', `🖨️ New Print Order!\nType: ${printTypeSelect.value.toUpperCase()}\nCopies: ${copiesInput.value}\nPages: ${detectedPages}\nTotal: ₹${calculatedTotal}`);
 
             try {
-                await fetch(`https://api.telegram.org/bot${8776483973:AAEGJyO3MQeZgDoOxngfw6EqPmDO9dvaIVc}/sendDocument`, {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
                     method: 'POST',
                     body: formData
                 });
