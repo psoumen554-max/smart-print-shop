@@ -47,9 +47,18 @@
             </div>
 
             <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-                Pay via UPI & Print
+                Generate Payment QR & Print
             </button>
         </form>
+
+        <!-- QR Display Section -->
+        <div id="qrContainer" class="hidden text-center space-y-3 pt-4 border-t border-slate-100">
+            <p class="text-sm font-medium text-slate-700">Scan with any UPI App to Pay</p>
+            <div id="qrcode" class="flex justify-center">
+                <img id="qrImage" src="" alt="Payment QR" class="w-48 h-48 border rounded-xl shadow-sm"/>
+            </div>
+            <p class="text-xs text-emerald-600 font-semibold">File sent to shop! Complete payment to collect print.</p>
+        </div>
     </div>
 
     <script>
@@ -64,7 +73,6 @@
         const pageCountDisplay = document.getElementById('pageCountDisplay');
         const totalAmountDisplay = document.getElementById('totalAmountDisplay');
 
-        // Configured Credentials
         const TELEGRAM_BOT_TOKEN = "8776483973:AAEGJyO3MQeZgDoOxngfw6EqPmDO9dvaIVc";
         const TELEGRAM_CHAT_ID = "643383513";
 
@@ -91,8 +99,7 @@
                         const pdf = await loadingTask.promise;
                         detectedPages = pdf.numPages;
                     } catch (err) {
-                        console.error("PDF reading error:", err);
-                        detectedPages = 1; // Fallback to 1 page if error occurs
+                        detectedPages = 1;
                     }
                     updateCost();
                 };
@@ -115,7 +122,7 @@
             }
 
             const btn = document.getElementById('submitBtn');
-            btn.textContent = "Sending file & opening UPI...";
+            btn.textContent = "Processing order...";
             btn.disabled = true;
 
             const formData = new FormData();
@@ -132,17 +139,17 @@
                 console.error(err);
             }
 
-            // Open UPI App
+            // Generate UPI QR Code on Screen
             const shopUpiID = "7029059551@okbizaxis"; 
             const shopName = "Solution Point";
             const upiUrl = `upi://pay?pa=${shopUpiID}&pn=${encodeURIComponent(shopName)}&am=${calculatedTotal}&cu=INR`;
             
-            window.location.href = upiUrl;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
             
-            setTimeout(() => {
-                btn.textContent = "Pay via UPI & Print";
-                btn.disabled = false;
-            }, 3000);
+            document.getElementById('qrImage').src = qrApiUrl;
+            document.getElementById('qrContainer').classList.remove('hidden');
+            
+            btn.textContent = "Order Placed Successfully!";
         });
     </script>
 </body>
